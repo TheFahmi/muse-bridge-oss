@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+
+# Next.js
+admin-next/node_modules/
+admin-next/.next/
+admin-next/out/
+
+# Runtime data (created on the server, never commit)
+api_keys.json
+admin_secret
+push_secret
+queue/
+real_quotas/
+real_quota.json
+*.bak
+*.log

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Muse — Bridge multi-akun</title>
+<meta name="description" content="Muse: bridge multi-akun Muse. Satu akun, satu API key. OpenAI-compatible.">
+<style>
+:root{
+  --bg:#ffffff; --soft:#f6f7f9; --line:#e8eaed;
+  --txt:#14171c; --dim:#5c6572; --faint:#9aa1ad;
+  --amber:#f59e0b; --ink:#14171c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:0 24px}
+::selection{background:#fde9c8}
+
+/* header */
+header{border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;
+  padding-top:16px;padding-bottom:16px}
+.brand{font-size:18px;font-weight:800;letter-spacing:-.02em;
+  display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--txt)}
+.brand i{width:10px;height:10px;border-radius:50%;background:var(--amber);display:inline-block}
+header nav a{font-size:14px;font-weight:600;color:var(--dim);text-decoration:none;margin-left:22px}
+header nav a:hover{color:var(--txt)}
+
+/* hero */
+.hero{padding:88px 0 40px}
+.domain{font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color:var(--faint);margin-bottom:20px}
+.domain b{color:var(--dim);font-weight:600}
+h1{font-size:clamp(36px,5.6vw,58px);line-height:1.1;letter-spacing:-.032em;
+  font-weight:800;max-width:680px}
+h1 .hl{color:var(--amber)}
+.lede{color:var(--dim);font-size:18px;max-width:600px;margin-top:18px}
+.cta{margin-top:30px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.btn{font-size:14.5px;font-weight:650;padding:13px 24px;border-radius:10px;
+  text-decoration:none;background:var(--ink);color:#fff;display:inline-block}
+.btn:hover{background:#2b303a}
+.textlink{font-size:14.5px;font-weight:600;color:var(--dim);text-decoration:none}
+.textlink:hover{color:var(--txt)}
+
+/* terminal */
+.term{margin:44px 0 0;border:1px solid #232830;border-radius:14px;
+  overflow:hidden;background:#101318}
+.term-head{padding:10px 18px;border-bottom:1px solid #232830}
+.term-head span{font:11px ui-monospace,Menlo,monospace;letter-spacing:.12em;
+  text-transform:uppercase;color:#6b7280}
+.term-body{padding:20px 22px;overflow-x:auto}
+pre{font:13.5px/1.75 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color:#d7dce3;white-space:pre}
+pre .c{color:#5f6875} pre .s{color:#7ee2a8} pre .k{color:#f5b942}
+
+/* sections */
+section{padding:64px 0;border-top:1px solid var(--line)}
+h2{font-size:22px;font-weight:750;letter-spacing:-.02em;margin-bottom:8px}
+.sub{color:var(--dim);font-size:15.5px;margin-bottom:8px;max-width:620px}
+
+/* steps — hairline list, not cards */
+.steps{list-style:none;margin-top:24px;border-top:1px solid var(--line)}
+.steps li{display:grid;grid-template-columns:56px 1fr;gap:18px;
+  padding:26px 0;border-bottom:1px solid var(--line)}
+.steps .no{font:700 15px ui-monospace,Menlo,monospace;color:var(--faint);padding-top:2px}
+.steps h3{font-size:16.5px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px}
+.steps p{font-size:14.5px;color:var(--dim);max-width:620px}
+.steps code,.inline{font:12.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  background:var(--soft);border:1px solid var(--line);padding:2px 8px;
+  border-radius:6px;color:#374151;white-space:nowrap}
+
+/* endpoint rows */
+.eps{margin-top:24px;border-top:1px solid var(--line)}
+.ep{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:baseline;
+  padding:15px 0;border-bottom:1px solid var(--line)}
+.ep .m{font:700 12px ui-monospace,Menlo,monospace;display:flex;gap:8px;align-items:center}
+.method{font-size:10.5px;font-weight:800;letter-spacing:.08em;padding:4px 8px;
+  border-radius:6px;text-transform:uppercase}
+.method.get{background:#eef0f3;color:#4b5563}
+.method.post{background:var(--ink);color:#fff}
+.ep code{font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--txt)}
+.ep p{font-size:14px;color:var(--dim)}
+
+.note{margin-top:28px;background:var(--soft);border:1px solid var(--line);
+  border-radius:12px;padding:18px 20px;font-size:14px;color:var(--dim)}
+.note b{color:var(--txt)}
+
+footer{border-top:1px solid var(--line);padding:26px 0;color:var(--faint);font-size:13px}
+footer .wrap{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+
+@media(max-width:640px){
+  .hero{padding:60px 0 32px}
+  .steps li{grid-template-columns:40px 1fr;gap:12px}
+  .ep{grid-template-columns:1fr;gap:6px}
+  section{padding:48px 0}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="/"><i></i>Muse</a>
+    <nav><a href="/admin/">Dashboard</a><a href="#api">API</a></nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="domain"><b>{{PUBLIC_HOST}}</b> — bridge</div>
+    <h1>Satu pintu untuk semua akun <span class="hl">Muse</span>.</h1>
+    <p class="lede">Punya lebih dari satu akun Muse? Muse meneruskan request ke akun yang tepat — tiap akun pegang API key sendiri, kuota ngikutin subscription asli akun itu.</p>
+    <div class="cta">
+      <a class="btn" href="/admin/">Buka dashboard</a>
+      <a class="textlink" href="#mulai">Cara pakai ↓</a>
+    </div>
+    <div class="term">
+      <div class="term-head"><span>langsung coba</span></div>
+      <div class="term-body"><pre><span class="c"># satu curl, dijawab langsung oleh Muse</span>
+curl {{PUBLIC_BASE_URL}}/v1/chat/completions \
+  -H <span class="s">"Authorization: Bearer muse_sk_&lt;key-akun-lu&gt;"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"model":"muse","messages":[{"role":"user","content":"Halo!"}]}'</span></pre></div>
+    </div>
+  </div>
+</div>
+
+<section id="mulai">
+  <div class="wrap">
+    <h2>Mulai dalam 3 langkah</h2>
+    <p class="sub">Nggak ada SDK, nggak ada registrasi berlapis. Key, request, jalan.</p>
+    <ol class="steps">
+      <li>
+        <span class="no">01</span>
+        <div><h3>Buat API key</h3>
+        <p>Di dashboard, buka halaman <b>+ Tambah</b>, isi nama akun, klik <b>Buat akun</b>. Satu akun Muse = satu API key. Prompt reporter otomatis disalin — kirim ke Muse di mesin tempat akun itu login supaya kuota real-nya kelapor tiap 30 menit.</p></div>
+      </li>
+      <li>
+        <span class="no">02</span>
+        <div><h3>Kirim request</h3>
+        <p><span class="inline">POST /v1/chat/completions</span> dengan header <span class="inline">Authorization: Bearer &lt;key&gt;</span>. Formatnya OpenAI-compatible, streaming SSE didukung — colok ke 9Router atau tool favorit lu langsung jalan.</p></div>
+      </li>
+      <li>
+        <span class="no">03</span>
+        <div><h3>Kuota ngikutin akun</h3>
+        <p>Dashboard baca subscription asli tiap akun: weekly limit, tanggal reset, additional tokens. Kuota habis? Request ditolak <span class="inline">429</span> — bukan error misterius.</p></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="api">
+  <div class="wrap">
+    <h2>API</h2>
+    <p class="sub">Semua endpoint <span class="inline">/v1/*</span> butuh header <span class="inline">Authorization: Bearer &lt;api-key&gt;</span>.</p>
+    <div class="eps">
+      <div class="ep">
+        <div class="m"><span class="method post">post</span></div>
+        <div><code>/v1/chat/completions</code><p>Chat. Streaming SSE didukung. 429 kalau kuota akun habis.</p></div>
+      </div>
+      <div class="ep">
+        <div class="m"><span class="method get">get</span></div>
+        <div><code>/v1/models</code><p>Daftar model yang tersedia.</p></div>
+      </div>
+      <div class="ep">
+        <div class="m"><span class="method get">get</span></div>
+        <div><code>/v1/real-quota</code><p>Kuota subscription asli milik key pemanggil.</p></div>
+      </div>
+      <div class="ep">
+        <div class="m"><span class="method post">post</span></div>
+        <div><code>/v1/real-quota</code><p>Lapor kuota dari mesin tempat akun login. Dipakai reporter.</p></div>
+      </div>
+      <div class="ep">
+        <div class="m"><span class="method get">get</span></div>
+        <div><code>/v1/health</code><p>Cek status bridge. Terbuka, tanpa auth.</p></div>
+      </div>
+    </div>
+    <div class="note"><b>Catatan:</b> cabut akses satu akun kapan aja dari dashboard — key-nya langsung mati, akun lain nggak keganggu.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Muse — dijawab langsung oleh Muse</span>
+    <span>{{PUBLIC_HOST}}</span>
+  </div>
+</footer>
+</body>
+</html>
