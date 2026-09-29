@@ -20,13 +20,13 @@ App/klien --(OpenAI API)--> bridge.py :8765 --queue--> worker (agent Muse)
 
 - VPS Ubuntu (akses sudo), Python 3.8+ (stdlib saja, tanpa dependency).
 - Node.js 18+ — hanya untuk build dashboard (sekali saja).
-- Agent Muse yang bisa SSH ke VPS (untuk menjawab antrean).
+- AI/agent untuk menjawab antrean — contoh `worker_example.py` bisa jalan langsung di VPS yang sama (tanpa SSH).
 
 ## Instalasi
 
 ```bash
 sudo mkdir -p /home/ubuntu/muse-bridge/queue/pending /home/ubuntu/muse-bridge/queue/done
-sudo cp bridge.py landing.html report_quota.py /home/ubuntu/muse-bridge/
+sudo cp bridge.py landing.html report_quota.py worker_example.py /home/ubuntu/muse-bridge/
 sudo chown -R ubuntu:ubuntu /home/ubuntu/muse-bridge
 sudo cp muse-bridge.service /etc/systemd/system/muse-bridge.service
 sudo systemctl daemon-reload
@@ -67,11 +67,27 @@ npm install
 
 ## Worker: yang menjawab antrean
 
-Bridge **tidak** menjawab sendiri — ia mengantrekan request sebagai file di `queue/pending/<id>.json` dan menunggu jawaban di `queue/done/<id>.json` maksimal 240 detik. Yang menjawab adalah agent Muse (cron):
+Bridge **tidak** menjawab sendiri — ia mengantrekan request sebagai file di `queue/pending/<id>.json` dan menunggu jawaban di `queue/done/<id>.json` maksimal 240 detik. Yang menjawab adalah agent/AI kamu, lewat worker.
 
-**Mode polling (default):** cron tiap N detik: list `queue/pending/`, jawab tiap request, tulis `{"content": "..."}` ke `queue/done/<id>.json`, hapus file pending. Request berumur > 220 detik dilewati (bridge membersihkannya sendiri).
+**Contoh worker** sudah disertakan: `worker_example.py`. Cara pakai:
 
-**Mode push (opsional):** set `PUSH_URL` — bridge POST `{"id": "<request-id>"}` (Bearer `push_secret`) ke worker setiap ada request baru, jadi worker bangun dalam hitungan detik, bukan menunggu interval cron.
+1. Ganti fungsi `answer()` di dalamnya dengan pemanggilan agent/AI kamu (menerima body request OpenAI, mengembalikan string jawaban).
+2. Jalankan tiap 10–60 detik, mis. via cron:
+   ```bash
+   * * * * * MUSE_BRIDGE_DIR=/home/ubuntu/muse-bridge /usr/bin/python3 /home/ubuntu/muse-bridge/worker_example.py
+   ```
+   atau loop sederhana:
+   ```bash
+   while true; do python3 worker_example.py; sleep 15; done
+   ```
+
+Protokol antrean (kalau kamu tulis worker sendiri):
+- Request: `queue/pending/<id>.json` berisi `{"id", "received_at", "request"}` (`request` = body `/v1/chat/completions`).
+- Klaim atomik: `rename()` file dari `pending/` ke folder kerjamu sendiri supaya dua worker tidak menjawab request yang sama.
+- Jawaban: tulis `{"content": "..."}` ke `queue/done/<id>.json`, lalu hapus file yang kamu klaim.
+- Request berumur > 220 detik dilewati saja (bridge sudah menyerah menunggu dan membersihkannya sendiri).
+
+**Mode push (opsional):** set `PUSH_URL` (lihat `.env.example`) — bridge POST `{"id": "<request-id>"}` (Bearer `push_secret`) ke worker setiap ada request baru, jadi worker bangun dalam hitungan detik, bukan menunggu interval cron.
 
 ## Multi-account & reporter kuota
 
